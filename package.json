@@ -1,5 +1,5 @@
 {
-  "name": "bachelor-server",
+  "name": "lnu-video-hosting-backend",
   "version": "0.0.1",
   "description": "Back-end of the video hosting app (bachelor thesis project)",
   "main": "index.js",
