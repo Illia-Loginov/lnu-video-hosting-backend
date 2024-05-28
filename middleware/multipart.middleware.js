@@ -1,6 +1,7 @@
 import multer from 'multer';
 import { randomUUID } from 'crypto';
 import { mkdirSync } from 'fs';
+import { readdir, unlink } from 'fs/promises';
 import path from 'path';
 import { uploadsFolder } from '../config/multipart.config.js';
 
@@ -16,3 +17,11 @@ const storage = multer.diskStorage({
 });
 
 export const uploadMiddleware = multer({ storage }).single('file');
+
+export const clearUploads = async () => {
+  const files = await readdir(uploadsFolder);
+
+  await Promise.all(
+    files.map((file) => unlink(path.resolve(uploadsFolder, file)))
+  );
+};

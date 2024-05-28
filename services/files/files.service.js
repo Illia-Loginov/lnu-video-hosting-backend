@@ -2,24 +2,31 @@ import { query } from '../../db.js';
 import { createReadStream } from 'fs';
 import { upload } from '../../s3.js';
 import { unlink } from 'fs/promises';
+import { clearUploads } from '../../middleware/multipart.middleware.js';
 
 export const uploadFile = async (file, payload) => {
   const { title } = payload;
   const { filename: id } = file;
 
-  const fileStream = createReadStream(file.path);
-  await upload(id, fileStream);
+  try {
+    const fileStream = createReadStream(file.path);
+    await upload(id, fileStream);
 
-  await unlink(file.path);
+    await unlink(file.path);
 
-  return (
-    (
-      await query('INSERT INTO files (id, title) VALUES ($1, $2) RETURNING *', [
-        id,
-        title
-      ])
-    )?.rows || []
-  );
+    return (
+      (
+        await query(
+          'INSERT INTO files (id, title) VALUES ($1, $2) RETURNING *',
+          [id, title]
+        )
+      )?.rows || []
+    );
+  } catch (error) {
+    await clearUploads();
+
+    throw error;
+  }
 };
 
 export const getAllFiles = async (payload) => {
