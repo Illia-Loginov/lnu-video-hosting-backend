@@ -9,3 +9,13 @@ export const uploadFile = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllFiles = async (req, res, next) => {
+  try {
+    const rows = await filesService.getAllFiles(req.query);
+
+    res.status(200).json(rows);
+  } catch (error) {
+    next(error);
+  }
+};

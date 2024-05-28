@@ -4,6 +4,9 @@ import { uploadMiddleware } from '../middleware/multipart.middleware.js';
 
 const router = Router();
 
-router.route('/').post(uploadMiddleware, filesController.uploadFile);
+router
+  .route('/')
+  .post(uploadMiddleware, filesController.uploadFile)
+  .get(filesController.getAllFiles);
 
 export default router;

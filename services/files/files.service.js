@@ -12,10 +12,39 @@ export const uploadFile = async (file, payload) => {
 
   await unlink(file.path);
 
-  const { rows = [] } = await query(
-    'INSERT INTO files (id, title) VALUES ($1, $2) RETURNING *',
-    [id, title]
+  return (
+    (
+      await query('INSERT INTO files (id, title) VALUES ($1, $2) RETURNING *', [
+        id,
+        title
+      ])
+    )?.rows || []
   );
+};
 
-  return rows;
+export const getAllFiles = async (payload) => {
+  const { sort = {}, skip = 0, limit = 0 } = payload;
+
+  let queryText = 'SELECT id, title, created_at FROM files';
+  const queryParams = [];
+
+  if (Object.keys(sort).length) {
+    queryText +=
+      ' ORDER BY ' +
+      Object.entries(sort)
+        .map(([key, value]) => `${key} ${value}`)
+        .join(', ');
+  }
+
+  if (skip) {
+    queryText += ` OFFSET $${queryParams.length + 1}`;
+    queryParams.push(skip);
+  }
+
+  if (limit) {
+    queryText += ` LIMIT $${queryParams.length + 1}`;
+    queryParams.push(limit);
+  }
+
+  return (await query(queryText, queryParams))?.rows || [];
 };
