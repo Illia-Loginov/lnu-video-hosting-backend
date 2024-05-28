@@ -1,6 +1,6 @@
 import { query } from '../../db.js';
 import { createReadStream } from 'fs';
-import { upload } from '../../s3.js';
+import { upload, getUrl } from '../../s3.js';
 import { unlink } from 'fs/promises';
 import { clearUploads } from '../../middleware/multipart.middleware.js';
 
@@ -20,7 +20,7 @@ export const uploadFile = async (file, payload) => {
           'INSERT INTO files (id, title) VALUES ($1, $2) RETURNING *',
           [id, title]
         )
-      )?.rows || []
+      )?.rows?.[0] || {}
     );
   } catch (error) {
     await clearUploads();
@@ -54,4 +54,18 @@ export const getAllFiles = async (payload) => {
   }
 
   return (await query(queryText, queryParams))?.rows || [];
+};
+
+export const getFileById = async (payload) => {
+  const { id } = payload;
+
+  const [queryResult, url] = await Promise.all([
+    query('SELECT title, created_at FROM files WHERE id = $1', [id]),
+    getUrl(id)
+  ]);
+
+  return {
+    ...queryResult?.rows?.[0],
+    url
+  };
 };

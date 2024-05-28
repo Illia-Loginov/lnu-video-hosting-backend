@@ -9,4 +9,6 @@ router
   .post(uploadMiddleware, filesController.uploadFile)
   .get(filesController.getAllFiles);
 
+router.route('/:id').get(filesController.getFileById);
+
 export default router;
