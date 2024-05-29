@@ -5,7 +5,11 @@ import {
   uploadConfig,
   urlExpiration
 } from './config/s3.config.js';
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  GetObjectCommand,
+  DeleteObjectCommand
+} from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -38,4 +42,13 @@ export const getUrl = async (key) => {
   });
 
   return await getSignedUrl(client, command, { expiresIn: urlExpiration });
+};
+
+export const deleteFile = async (key) => {
+  const command = new DeleteObjectCommand({
+    Bucket: bucket,
+    Key: getInputFileKey(key)
+  });
+
+  await client.send(command);
 };

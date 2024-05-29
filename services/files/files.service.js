@@ -1,6 +1,6 @@
 import { query } from '../../db.js';
 import { createReadStream } from 'fs';
-import { upload, getUrl } from '../../s3.js';
+import { upload, getUrl, deleteFile } from '../../s3.js';
 import { unlink } from 'fs/promises';
 import { clearUploads } from '../../middleware/multipart.middleware.js';
 import { notFound } from '../../utils/errors.js';
@@ -78,4 +78,21 @@ export const getFileById = async (payload) => {
     ...queryResult.rows[0],
     url
   };
+};
+
+export const deleteFileById = async (payload) => {
+  const { id } = await validateGetFileById(payload);
+
+  const queryResult = await query(
+    'SELECT title, created_at FROM files WHERE id = $1',
+    [id]
+  );
+
+  if (!queryResult?.rows?.[0]) {
+    throw notFound('File not found');
+  }
+
+  await deleteFile(id);
+
+  await query('DELETE FROM files WHERE id = $1', [id]);
 };

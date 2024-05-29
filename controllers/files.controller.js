@@ -29,3 +29,13 @@ export const getFileById = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteFileById = async (req, res, next) => {
+  try {
+    await filesService.deleteFileById(req.params);
+
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+};
