@@ -11,10 +11,10 @@ import {
 } from './files.validate.js';
 
 export const uploadFile = async (file, payload) => {
-  const { title } = await validateUploadFile(payload);
-  const { filename: id } = file;
-
   try {
+    const { title } = await validateUploadFile(payload);
+    const { filename: id } = file;
+
     const fileStream = createReadStream(file.path);
     await upload(id, fileStream);
 
