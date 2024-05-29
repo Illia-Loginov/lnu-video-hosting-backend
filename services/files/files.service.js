@@ -3,6 +3,7 @@ import { createReadStream } from 'fs';
 import { upload, getUrl } from '../../s3.js';
 import { unlink } from 'fs/promises';
 import { clearUploads } from '../../middleware/multipart.middleware.js';
+import { notFound } from '../../utils/errors.js';
 
 export const uploadFile = async (file, payload) => {
   const { title } = payload;
@@ -64,8 +65,12 @@ export const getFileById = async (payload) => {
     getUrl(id)
   ]);
 
+  if (!queryResult?.rows?.[0]) {
+    throw notFound('File not found');
+  }
+
   return {
-    ...queryResult?.rows?.[0],
+    ...queryResult.rows[0],
     url
   };
 };
