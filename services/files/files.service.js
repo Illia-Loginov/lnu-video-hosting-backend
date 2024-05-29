@@ -4,9 +4,14 @@ import { upload, getUrl } from '../../s3.js';
 import { unlink } from 'fs/promises';
 import { clearUploads } from '../../middleware/multipart.middleware.js';
 import { notFound } from '../../utils/errors.js';
+import {
+  validateGetAllFiles,
+  validateGetFileById,
+  validateUploadFile
+} from './files.validate.js';
 
 export const uploadFile = async (file, payload) => {
-  const { title } = payload;
+  const { title } = await validateUploadFile(payload);
   const { filename: id } = file;
 
   try {
@@ -31,7 +36,7 @@ export const uploadFile = async (file, payload) => {
 };
 
 export const getAllFiles = async (payload) => {
-  const { sort = {}, skip = 0, limit = 0 } = payload;
+  const { sort = {}, skip = 0, limit = 0 } = await validateGetAllFiles(payload);
 
   let queryText = 'SELECT id, title, created_at FROM files';
   const queryParams = [];
@@ -58,7 +63,7 @@ export const getAllFiles = async (payload) => {
 };
 
 export const getFileById = async (payload) => {
-  const { id } = payload;
+  const { id } = await validateGetFileById(payload);
 
   const [queryResult, url] = await Promise.all([
     query('SELECT title, created_at FROM files WHERE id = $1', [id]),
