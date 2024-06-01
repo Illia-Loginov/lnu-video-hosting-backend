@@ -6,5 +6,7 @@ export default {
   host: DB_HOST,
   port: DB_PORT,
   database: DB_NAME,
-  ssl: true
+  ssl: {
+    rejectUnauthorized: false
+  }
 };
