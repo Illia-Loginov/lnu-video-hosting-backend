@@ -5,5 +5,6 @@ export default {
   password: DB_PASSWORD,
   host: DB_HOST,
   port: DB_PORT,
-  database: DB_NAME
+  database: DB_NAME,
+  ssl: true
 };
