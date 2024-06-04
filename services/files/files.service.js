@@ -3,7 +3,7 @@ import { createReadStream } from 'fs';
 import { upload, getUrl, deleteFile } from '../../s3.js';
 import { unlink } from 'fs/promises';
 import { clearUploads } from '../../middleware/multipart.middleware.js';
-import { notFound } from '../../utils/errors.js';
+import { notFound, badRequest } from '../../utils/errors.js';
 import {
   validateGetAllFiles,
   validateGetFileById,
@@ -12,6 +12,10 @@ import {
 
 export const uploadFile = async (file, payload) => {
   try {
+    if (!file) {
+      throw badRequest(`'file' is required`);
+    }
+
     const { title } = await validateUploadFile(payload);
     const { filename: id } = file;
 
